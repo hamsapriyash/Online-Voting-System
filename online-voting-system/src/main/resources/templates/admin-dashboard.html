@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>Admin Dashboard</h2>
+
+        <h3>Add Candidate</h3>
+
+        <form method="post" action="/admin/add-candidate">
+
+            <input name="name" placeholder="Candidate Name" required>
+            <input name="party" placeholder="Party" required>
+
+            <button type="submit">Add Candidate</button>
+        </form>
+
+        <hr>
+
+        <h3>Candidate List</h3>
+
+        <ul>
+            <li th:each="c : ${candidates}">
+                <span th:text="${c.name}"></span> —
+                <span th:text="${c.party}"></span>
+            </li>
+        </ul>
+
+    </div>
+
+</body>
+
+</html>

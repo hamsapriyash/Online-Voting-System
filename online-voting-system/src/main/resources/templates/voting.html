@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Vote</title>
+    <link rel="stylesheet" th:href="/style.css">
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>Cast Your Vote</h2>
+
+        <form method="post" action="/vote">
+
+            <div th:each="c : ${candidates}" class="candidate">
+                <input type="radio" name="candidateId" th:value="${c.id}" required>
+                <span th:text="${c.name}"></span>
+                <small th:text="${c.party}"></small>
+            </div>
+
+            <input type="number" name="voterId" placeholder="Enter Your Voter ID" required>
+
+            <button type="submit">Submit Vote</button>
+        </form>
+
+    </div>
+
+</body>
+
+</html>
