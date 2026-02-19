@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Online Voting System</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>VoteSmart</h1>
+                <p>Secure Voice, Trusted Choice</p>
+            </div>
+
+            <!-- Error message if login fails -->
+            <div th:if="${param.error}" class="error-message">
+                Invalid username or password. Please try again.
+            </div>
+
+            <!-- Logout message -->
+            <div th:if="${param.logout}" class="error-message"
+                style="background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); color: #86efac;">
+                You have been successfully logged out.
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="username">Voter ID</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" name="username" required
+                            placeholder="Enter your 10-digit Voter ID">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">Sign In</button>
+            </form>
+
+            <div class="divider">OR</div>
+            <a th:href="@{/admin-login}" class="btn-admin">Login as Administrator</a>
+
+            <div class="footer-links">
+                <p>Don't have an account? <a href="#">Register Now</a></p>
+                <p style="margin-top: 10px;"><a href="#" style="font-size: 0.8rem; opacity: 0.7;">Forgot Password?</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

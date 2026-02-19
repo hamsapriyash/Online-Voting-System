@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Voter | Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <style>
+        .login-header h1 {
+            background: linear-gradient(to right, #60a5fa, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-login {
+            background: #6366f1;
+        }
+
+        .btn-login:hover {
+            background: #4f46e5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>Add New Voter</h1>
+                <p>Register a new eligible individual in the system</p>
+            </div>
+
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+            <form th:action="@{/admin/add-voter}" method="post">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="name" name="name" required placeholder="John Doe">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Voter ID / Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" name="username" required placeholder="VOTER123">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" name="email" required placeholder="john@example.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Initial Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">Register Voter</button>
+            </form>
+
+            <div class="divider">OR</div>
+            <a th:href="@{/admin/dashboard}" class="btn-admin"
+                style="background: rgba(255, 255, 255, 0.05); color: white;">Cancel & Return</a>
+        </div>
+    </div>
+</body>
+
+</html>
