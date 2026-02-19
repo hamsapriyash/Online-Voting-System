@@ -1,6 +1,9 @@
 package com.onlinevotingsystem.VotingSystem.config;
 
 import com.onlinevotingsystem.VotingSystem.service.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,11 +39,23 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/admin-login", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/voter/**").hasRole("VOTER")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/admin/dashboard", true)
+                        .successHandler((request, response, authentication) -> {
+                            for (var auth : authentication.getAuthorities()) {
+                                if (auth.getAuthority().equals("ROLE_ADMIN")) {
+                                    response.sendRedirect("/admin/dashboard");
+                                    return;
+                                } else if (auth.getAuthority().equals("ROLE_VOTER")) {
+                                    response.sendRedirect("/voter/dashboard");
+                                    return;
+                                }
+                            }
+                            response.sendRedirect("/login");
+                        })
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout")

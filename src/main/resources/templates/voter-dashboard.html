@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voter Dashboard | Online Voting System</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}" />
+    <style>
+        .dashboard-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .voter-info h2 {
+            margin: 0;
+            background: linear-gradient(to right, #60a5fa, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-voted {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .status-pending {
+            background: rgba(234, 179, 8, 0.1);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.2);
+        }
+
+        .party-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .party-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .party-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(96, 165, 250, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .party-symbol {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .party-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .party-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .vote-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .vote-btn:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .vote-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Feedback Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .feedback-card {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .feedback-card {
+            transform: scale(1);
+        }
+
+        .feedback-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feedback-card h2 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .feedback-card p {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .feedback-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            resize: none;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+
+        .btn-submit-feedback {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit-feedback:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        /* Category Chips Styling */
+        .category-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .category-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .category-chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(96, 165, 250, 0.3);
+        }
+
+        .category-chip.selected {
+            background: rgba(96, 165, 250, 0.1);
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
+    </style>
+</head>
+
+<body style="overflow-y: auto;">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="dashboard-container">
+        <div class="header">
+            <div>
+                <h1
+                    style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    VoteSmart Dashboard</h1>
+                <p style="color: var(--text-secondary);">Your vote is your power</p>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+        <div th:if="${param.success != null}" class="alert alert-success">Your vote has been cast successfully! Thank
+            you for participating.</div>
+        <div th:if="${param.error != null}" class="alert alert-error">You have already cast your vote for this election.
+        </div>
+        <div class="welcome-section" th:if="${voter != null}">
+            <div class="voter-info">
+                <p style="color: var(--text-secondary); margin-bottom: 5px; font-size: 0.9rem;">Welcome back,</p>
+                <h2 th:text="${voter.name}">Voter Name</h2>
+                <p style="color: var(--text-secondary); margin-top: 5px; font-size: 0.8rem;">Voter ID: <span
+                        th:text="${voter.username}">V123456789</span></p>
+            </div>
+            <div class="voter-status">
+                <span th:if="${voter.hasVoted}" class="status-badge status-voted">✓ VOTED</span>
+                <span th:if="${!voter.hasVoted}" class="status-badge status-pending">● PENDING</span>
+            </div>
+        </div>
+        <h3 style="color: white; margin-bottom: 25px; font-weight: 600;">Select a Candidate / Party</h3>
+        <div class="party-grid">
+            <div th:each="party : ${parties}" class="party-card">
+                <div class="party-symbol">
+                    <img th:if="${party.symbolUrl != null}" th:src="${party.symbolUrl}" alt="Symbol"
+                        style="width: 100%; height: 100%; object-fit: contain;" />
+                    <span th:if="${party.symbolUrl == null}">🏛️</span>
+                </div>
+                <div class="party-name" th:text="${party.name}">Party Name</div>
+                <div class="party-desc" th:text="${party.description}">Description about the party and their vision for
+                    the upcoming term.</div>
+                <form th:action="@{/voter/vote}" method="post">
+                    <input type="hidden" name="partyId" th:value="${party.id}" />
+                    <button type="submit" class="vote-btn" th:disabled="${voter != null and voter.hasVoted}">
+                        <span
+                            th:text="${voter != null and voter.hasVoted ? 'Vote Cast' : 'Vote for ' + party.name}">Vote</span>
+                    </button>
+                </form>
+            </div>
+            <div th:if="${parties == null or parties.empty}"
+                style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                <p style="color: var(--text-secondary);">No parties have been registered for this election yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal-overlay" th:classappend="${param.success != null ? 'active' : ''}">
+        <div class="feedback-card">
+            <div class="feedback-icon">🎉</div>
+            <h2>Vote Cast Successfully!</h2>
+            <p>What areas should be prioritized for your district's growth?</p>
+
+            <div class="category-container">
+                <div class="category-chip" onclick="toggleChip(this)">Clean Environment</div>
+                <div class="category-chip" onclick="toggleChip(this)">Infrastructure Development</div>
+                <div class="category-chip" onclick="toggleChip(this)">Sports Improvement</div>
+                <div class="category-chip" onclick="toggleChip(this)">Education Quality</div>
+                <div class="category-chip" onclick="toggleChip(this)">Health Care Access</div>
+            </div>
+
+            <textarea class="feedback-textarea" rows="3" placeholder="Additional comments or concerns..."></textarea>
+
+            <div class="feedback-options">
+                <button type="button" class="btn-submit-feedback" onclick="handleLogout()">Submit & Logout
+                    Securely</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden form for secure logout -->
+    <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;"></form>
+
+    <script th:inline="javascript">
+        function toggleChip(element) {
+            element.classList.toggle('selected');
+        }
+
+        function handleLogout() {
+            // In a real app, you could save the feedback via AJAX here before logging out
+            document.getElementById('logoutForm').submit();
+        }
+
+        // Close modal if user clicks outside the card (optional)
+        document.getElementById('feedbackModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                handleLogout();
+            }
+        });
+    </script>
+</body>
+
+</html>

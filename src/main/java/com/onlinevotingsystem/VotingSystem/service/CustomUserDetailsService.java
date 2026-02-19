@@ -1,7 +1,9 @@
 package com.onlinevotingsystem.VotingSystem.service;
 
 import com.onlinevotingsystem.VotingSystem.model.Admin;
+import com.onlinevotingsystem.VotingSystem.model.Voter;
 import com.onlinevotingsystem.VotingSystem.repository.AdminRepository;
+import com.onlinevotingsystem.VotingSystem.repository.VoterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -18,15 +20,28 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private AdminRepository adminRepository;
 
+    @Autowired
+    private VoterRepository voterRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // First try to find as Admin
-        Admin admin = adminRepository.findByUsername(username)
+        var adminOptional = adminRepository.findByUsername(username);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+            return new User(
+                    admin.getUsername(),
+                    admin.getPassword(),
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+        }
+
+        // Then try to find as Voter
+        Voter voter = voterRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
         return new User(
-                admin.getUsername(),
-                admin.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+                voter.getUsername(),
+                voter.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_VOTER")));
     }
 }

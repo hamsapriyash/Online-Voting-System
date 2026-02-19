@@ -25,11 +25,7 @@
                 Invalid username or password. Please try again.
             </div>
 
-            <!-- Logout message -->
-            <div th:if="${param.logout}" class="error-message"
-                style="background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); color: #86efac;">
-                You have been successfully logged out.
-            </div>
+
 
             <form th:action="@{/login}" method="post">
                 <div class="form-group">
@@ -54,7 +50,6 @@
             <a th:href="@{/admin-login}" class="btn-admin">Login as Administrator</a>
 
             <div class="footer-links">
-                <p>Don't have an account? <a href="#">Register Now</a></p>
                 <p style="margin-top: 10px;"><a href="#" style="font-size: 0.8rem; opacity: 0.7;">Forgot Password?</a>
                 </p>
             </div>
